@@ -17,6 +17,7 @@ from ecdsa.util import sigencode_der
 from functools import partial
 from abc import ABCMeta
 
+from ..lib.ripemd160 import ripemd160
 from ..lib.types import HexSerializable
 from .address import P2pkhAddress, P2wpkhAddress
 from ..setup import is_mainnet, net_name, strictness
@@ -197,10 +198,8 @@ class PublicKey(BasePublicKey):
     def hash(self):
         import hashlib
         original = self.uncompressed if self.type == 'uncompressed' else self.compressed
-        sha = hashlib.sha256(original).digest()
-        ripe = hashlib.new('ripemd160')
-        ripe.update(sha)
-        return bytearray(ripe.digest())
+        ripemd160(hashlib.sha256(original).digest())
+        return bytearray(ripemd160(hashlib.sha256(original).digest()))
 
     def compress(self):
         if self.type != 'uncompressed':

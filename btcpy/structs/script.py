@@ -15,6 +15,7 @@ from hashlib import sha256
 from binascii import hexlify, unhexlify
 from abc import ABCMeta, abstractmethod
 
+from ..lib.ripemd160 import ripemd160
 from ..lib.types import HexSerializable, Immutable, cached
 from ..lib.parsing import ScriptParser, Parser, Stream, UnexpectedOperationFound
 from ..lib.opcodes import OpCodeConverter
@@ -434,9 +435,7 @@ class ScriptPubKey(BaseScript, metaclass=ABCMeta):
 
     @cached
     def p2sh_hash(self):
-        ripemd160 = hashlib.new('ripemd160')
-        ripemd160.update(hashlib.sha256(self.body).digest())
-        return bytearray(ripemd160.digest())
+        return bytearray(ripemd160(hashlib.sha256(self.body).digest()))
 
     @cached
     def p2wsh_hash(self):
@@ -1126,10 +1125,7 @@ class Hashlock160Script(HashlockScript):
 
     @staticmethod
     def hash_func(data):
-        sha = sha256(data).digest()
-        ripe = hashlib.new('ripemd160')
-        ripe.update(sha)
-        return bytearray(ripe.digest())
+        return bytearray(ripemd160(sha256(data).digest()))
 
     @staticmethod
     def hash_size():

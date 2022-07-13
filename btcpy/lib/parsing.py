@@ -13,6 +13,7 @@ from binascii import hexlify, unhexlify
 from hashlib import sha256
 import hashlib
 
+from .ripemd160 import ripemd160
 from .types import Serializable, HexSerializable
 from .opcodes import OpCodeConverter
 
@@ -385,18 +386,13 @@ class Stream(HexSerializable):
         return bytearray(sha256(self.body).digest())
 
     def ripemd(self):
-        ripe = hashlib.new('ripemd160')
-        ripe.update(self.body)
-        return bytearray(ripe.digest())
+        return bytearray(ripemd160(self.body))
 
     def hash256(self):
         return bytearray(sha256(sha256(self.body).digest()).digest())
 
     def hash160(self):
-        sha = sha256(self.body).digest()
-        ripe = hashlib.new('ripemd160')
-        ripe.update(sha)
-        return bytearray(ripe.digest())
+        return bytearray(ripemd160(sha256(self.body).digest()))
 
     def serialize(self):
         return self.body
